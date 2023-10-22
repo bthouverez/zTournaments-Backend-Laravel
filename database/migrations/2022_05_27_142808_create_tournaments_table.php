@@ -19,6 +19,7 @@ class CreateTournamentsTable extends Migration
             $table->date('date');
             $table->string('place')->nullable();
             $table->string('coordinates')->nullable();
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
