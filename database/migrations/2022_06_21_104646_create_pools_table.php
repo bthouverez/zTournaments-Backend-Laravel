@@ -16,7 +16,7 @@ class CreatePoolsTable extends Migration
         Schema::create('pools', function (Blueprint $table) {
             $table->id();
             $table->string('label');
-            // Type: 1 => group stage, 2 => playoff, 3 => précision
+            // Type: 1 => bracket, 2 => playoff, 3 => precision
             $table->integer('type');
             $table->foreignId('tournament_id')->constrained();
             $table->timestamps();

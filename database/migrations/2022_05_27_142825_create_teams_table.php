@@ -15,6 +15,7 @@ class CreateTeamsTable extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
+            $table->string('label');
             $table->foreignId('bracket_id')->nullable()->constrained(
                 table: 'pools', indexName: 'team_bracket_id'
             );

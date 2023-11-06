@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Player extends Model
+class PrecisionPool extends Model
 {
     use HasFactory;
 
-    public function team()
+    public function pool()
     {
-        return $this->belongsTo(Team::class);
+        return $this->belongsTo(Pool::class);
     }
 }

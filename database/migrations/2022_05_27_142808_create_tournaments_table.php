@@ -18,6 +18,8 @@ class CreateTournamentsTable extends Migration
             $table->string('label');
             $table->date('date');
             $table->string('place')->nullable();
+            $table->integer('team_size'); // 0 => tir de précision
+            $table->boolean('has_brackets');
             $table->string('coordinates')->nullable();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();

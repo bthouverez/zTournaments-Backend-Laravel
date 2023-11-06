@@ -1,6 +1,12 @@
 <?php
 
+use App\Livewire\TournamentBracket;
 use App\Livewire\TournamentList;
+use App\Livewire\TournamentPlayoff;
+use App\Livewire\TournamentPrecision;
+use App\Livewire\TournamentRegistration;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+if(env('APP_ENV') == 'local') {
+    Auth::login(User::find(1));
+}
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,5 +36,9 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/tournaments', TournamentList::class);
+    Route::get('/tournaments', TournamentList::class)->name('tournaments');
+    Route::get('/tournaments/{tournament}/registration', TournamentRegistration::class);
+    Route::get('/tournaments/{tournament}/bracket', TournamentBracket::class);
+    Route::get('/tournaments/{tournament}/playoff', TournamentPlayoff::class);
+    Route::get('/tournaments/{tournament}/precision', TournamentPrecision::class);
 });
