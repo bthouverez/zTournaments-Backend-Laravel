@@ -41,26 +41,23 @@ class TournamentRegistration extends Component
         if($this->newPlayer1) {
             $player1 = new Player();
             $player1->name = ucwords($this->newPlayer1);
-            $player1->tournament_id = $this->tournament->id;
         }
 
         // Ajoute le joueur 2
         if($this->newPlayer2) {
             $player2 = new Player();
             $player2->name = ucwords($this->newPlayer2);
-            $player2->tournament_id = $this->tournament->id;
         }
 
         // Ajoute le joueur 3
         if($this->newPlayer3) {
             $player3 = new Player();
             $player3->name = ucwords($this->newPlayer3);
-            $player3->tournament_id = $this->tournament->id;
         }
 
         // Crée l'équipe
         $team = new Team();
-        $team->label = $this->tournament->team_size == 1 ? $player1->name : __('Team').' '.++$this->teamsCount;
+        $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team').' '.++$this->teamsCount;
         $team->tournament_id = $this->tournament->id;
         $team->save();
 
@@ -84,27 +81,19 @@ class TournamentRegistration extends Component
         $this->newPlayer3 = "";
         $this->newTeam = "";
     }
-    public function generateTeamsOf($n)
-    {
-        $teamToDelete = $this->resetTeams();
 
-        // Chunk les joueurs
-        $playersChunks = $this->tournament->players->shuffle()->chunk($n);
-        foreach ($playersChunks as $ii => $rawTeam) {
-            // Crée une équipe par chunk
-            $team = new Team();
-            $team->label = $n == 1 ? $rawTeam->first()->name : "Equipe " . ($ii + 1);
-            $team->tournament_id = $this->tournament->id;
-            $team->save();
-            // Met à jour les équipes des joueurs
-            foreach ($rawTeam as $player) {
-                $player->team_id = $team->id;
-                $player->save();
-            }
+
+    public function generate()
+    {
+        if($this->tournament->team_size == 0) {
+            $this->generatePrecision();
+        } else if($this->tournament->has_brackets) {
+            $this->generateBrackets(4);
+        } else {
+            $this->generatePlayoff();
         }
-        // Supprime l'équipe indéfinie
-        $teamToDelete->delete();
     }
+
     public function generatePlayoffMatches($teams, $name = 'tournoi')
     {
         $this->nextStep = "playoff";
@@ -206,15 +195,15 @@ class TournamentRegistration extends Component
             $next_match->save();
         }
     }
-    public function generateBrackets($n)
+    public function generateBrackets($size)
     {
         $this->resetMatches();
         $this->nextStep = "bracket";
 
         // Chunk les équipes
-        $bracketsChunks = $this->tournament->teams->shuffle()->chunk(4);
+        $bracketsChunks = $this->tournament->teams->shuffle()->chunk($size);
         $lastChunkId = count($bracketsChunks) - 1;
-        $nbMissingTeams = $n - count($bracketsChunks[$lastChunkId]);
+        $nbMissingTeams = $size - count($bracketsChunks[$lastChunkId]);
         // Réarrange les chunks si pas un multiple de n
         if ($nbMissingTeams != 0) {
             // Crée et ajoute un EXEMPT
@@ -318,19 +307,15 @@ class TournamentRegistration extends Component
             shuffle($data[$ii]);
         }
 
-        // Insère les premiers et seconds dans le principal, 3e et 4e dans le complémentaire
+        // Insère les premiers et seconds dans le principal
         $tournoi_principal = [];
-        $tournoi_parallele = [];
         for ($ii = 0; $ii < $this->tournament->brackets->count(); $ii++) {
             $tournoi_principal[] = array_pop($data[0]);
             $tournoi_principal[] = array_pop($data[1]);
-            $tournoi_parallele[] = array_pop($data[2]);
-            $tournoi_parallele[] = array_pop($data[3]);
         }
 
         $this->generatePlayoffMatches($tournoi_principal, 'principal');
     }
-
     public function generatePrecision()
     {
         $p = new Pool;
@@ -344,6 +329,7 @@ class TournamentRegistration extends Component
         $this->nextStep = 'precision';
         return redirect('/tournaments/'.$this->tournament->id.'/precision');
     }
+
     public function removeTeam(int $id) {
         Player::where('team_id', $id)->delete();
         Team::find($id)->delete();
@@ -358,6 +344,7 @@ class TournamentRegistration extends Component
         }
         // Supprime les équipes
         Team::where('tournament_id', $this->tournament->id)->delete();
+        $this->teamsCount = 0;
     }
     public function resetMatches()
     {

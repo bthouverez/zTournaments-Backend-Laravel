@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $t->date = '2023-11-05';
         $t->team_size = 2;
         $t->user_id = 1;
+        $t->has_brackets = true;
         $t->save();
 
         $t = new Tournament;
@@ -35,6 +36,7 @@ class DatabaseSeeder extends Seeder
         $t->date = '2023-11-06';
         $t->team_size = 3;
         $t->user_id = 1;
+        $t->has_brackets = true;
         $t->save();
 
         $t = new Tournament;
@@ -43,6 +45,7 @@ class DatabaseSeeder extends Seeder
         $t->date = '2023-11-07';
         $t->team_size = 1;
         $t->user_id = 1;
+        $t->has_brackets = true;
         $t->save();
 
         $t = new Tournament;
@@ -51,6 +54,7 @@ class DatabaseSeeder extends Seeder
         $t->date = '2023-07-31';
         $t->team_size = 0;
         $t->user_id = 1;
+        $t->has_brackets = true;
         $t->save();
 
         // \App\Models\User::factory(10)->create();

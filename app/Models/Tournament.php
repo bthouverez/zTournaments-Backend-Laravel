@@ -29,8 +29,8 @@ class Tournament extends Model
         return $this->hasMany(Pool::class, 'tournament_id')->where('type', 1)->orderBy('id');
     }
 
-    public function playoffs() {
-        return $this->hasMany(Pool::class, 'tournament_id')->where('type', 2)->orderBy('id');
+    public function playoff() {
+        return $this->hasOne(Pool::class, 'tournament_id')->where('type', 2)->orderBy('id');
     }
 
     public function precision() {
