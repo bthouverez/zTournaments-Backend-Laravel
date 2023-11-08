@@ -1,5 +1,4 @@
 <div class="md:w-2/3 m-auto">
-    @dump($selected_match_id)
     <div class="mt-4">
         <div>
             <h1 class="text-xl font-bold">{{ __('Pools') }}</h1>
@@ -12,7 +11,7 @@
         </a>
         <hr class="my-4">
 {{--        TODO --}}
-        @if(1)
+        @if(!$tournament->brackets->map->matches->first()->map->isPlayed()->contains(false))
             <button
                 wire:click="generatePlayoffFromBrackets"
                 class="bg-transparent hover:bg-orange-500 text-orange-700 font-semibold hover:text-white py-2 px-4 border border-orange-500 hover:border-transparent rounded">
@@ -86,7 +85,7 @@
                 @endforeach
                 @if($bracket->results())
                     <ul class="m-4 border border-solid border-black text-center">
-                        <li class="border border-black border-solid"><strong>Classement</strong></li>
+                        <li class="border border-black border-solid"><strong class="px-2">Classement</strong></li>
                         <li class="border border-black border-solid p-2 bg-green-700">1
                             - {{ $bracket->results()[0]->label }}</li>
                         <li class="border border-black border-solid p-2 bg-green-700">2

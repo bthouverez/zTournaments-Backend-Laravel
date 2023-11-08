@@ -29,6 +29,9 @@ class Pool extends Model
 
     public function results()
     {
-
+        if(!$this->matches->map->isPlayed()->contains(false)) {
+            return $this->bracket_teams->sortByDesc('score')->values();
+        }
+        return false;
     }
 }

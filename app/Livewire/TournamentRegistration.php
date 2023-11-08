@@ -321,14 +321,16 @@ class TournamentRegistration extends Component
     }
     public function generatePrecision()
     {
-        $p = new Pool;
-        $p->tournament_id = $this->tournament->id;
-        $p->label = 'precision';
-        $p->type = 3;
-        $p->save();
-        $pp = new PrecisionPool;
-        $pp->pool_id = $p->id;
-        $pp->save();
+        if (!$this->tournament->precision->count()) {
+            $p = new Pool;
+            $p->tournament_id = $this->tournament->id;
+            $p->label = 'precision';
+            $p->type = 3;
+            $p->save();
+            $pp = new PrecisionPool;
+            $pp->pool_id = $p->id;
+            $pp->save();
+        }
         return redirect('/tournaments/'.$this->tournament->id.'/precision');
     }
 

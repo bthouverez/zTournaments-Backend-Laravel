@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Team;
 use Livewire\Component;
 use App\Models\Game;
 use App\Models\Pool;
@@ -29,7 +30,6 @@ class TournamentBracket extends Component
             ->select('games.*')
             ->orderBy('id')
             ->get();
-
     }
 
     public function selectMatch($match_id)
@@ -48,6 +48,13 @@ class TournamentBracket extends Component
         $match->save();
         $winner_id = $this->score_team_1 == 13 ? $match->team_1_id : $match->team_2_id;
         $loser_id = $this->score_team_1 == 13 ? $match->team_2_id : $match->team_1_id;
+        $winner = Team::find($winner_id);
+        $winner->score += 2;
+        $winner->save();
+        $loser = Team::find($loser_id);
+        $loser->score -= 1;
+        $loser->save();
+
         $this->selected_match_id = 0;
 
         // MEt à jour les équipes des matchs suivants
@@ -64,6 +71,7 @@ class TournamentBracket extends Component
             else $loser_match->team_1_id = $loser_id;
             $loser_match->save();
         }
+        return redirect('/tournaments/'.$this->tournament->id.'/bracket');
     }
 
     public function resetScore()
@@ -71,6 +79,12 @@ class TournamentBracket extends Component
         $match = Game::find($this->selected_match_id);
         $winner_id = $match->team_1_score == 13 ? $match->team_1_id : $match->team_2_id;
         $loser_id = $match->team_1_score == 13 ? $match->team_2_id : $match->team_1_id;
+        $winner = Team::find($winner_id);
+        $winner->score -= 2;
+        $winner->save();
+        $loser = Team::find($loser_id);
+        $loser->score += 1;
+        $loser->save();
 
         $next_match_winner = $match->winner_next_match;
         $next_match_loser = $match->loser_next_match;
@@ -97,6 +111,7 @@ class TournamentBracket extends Component
         $match->team_1_score = 0;
         $match->team_2_score = 0;
         $match->save();
+        return redirect('/tournaments/'.$this->tournament->id.'/bracket');
     }
 
 

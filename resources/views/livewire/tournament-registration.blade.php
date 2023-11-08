@@ -3,18 +3,20 @@
         <h1 class="text-2xl font-extrabold">{{ __('Registration') }} - {{ $tournament->label }}</h1>
         <h2>@if($tournament->team_size == 0)
                 {{ __('Precision') }}
-            @elseif($tournament->team_size == 1)
-                {{ __('Simple') }}
-            @elseif($tournament->team_size == 2)
-                {{ __('Double') }}
-            @elseif($tournament->team_size == 3)
-                {{ __('Triple') }}
-            @endif
-            -
-            @if($tournament->has_brackets)
-                {{ __('Pools') }}
             @else
-                {{ __('Playoff') }}
+                @if($tournament->team_size == 1)
+                    {{ __('Simple') }}
+                @elseif($tournament->team_size == 2)
+                    {{ __('Double') }}
+                @elseif($tournament->team_size == 3)
+                    {{ __('Triple') }}
+                @endif
+                -
+                @if($tournament->has_brackets)
+                    {{ __('Pools') }}
+                @else
+                    {{ __('Playoff') }}
+                @endif
             @endif
         </h2>
         <a href="/tournaments">
