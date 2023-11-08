@@ -26,7 +26,12 @@ class TournamentRegistration extends Component
         $this->newPlayer1 = "";
         $this->newPlayer2 = "";
         $this->newPlayer3 = "";
-        $this->nextStep = "";
+        if($tournament->team_size == 0)
+            $this->nextStep = "precision";
+        else if($tournament->has_brackets)
+            $this->nextStep = "bracket";
+        else
+            $this->nextStep = "playoff";
         $this->teamsCount = $this->tournament->teams->count();
     }
 
@@ -96,7 +101,6 @@ class TournamentRegistration extends Component
 
     public function generatePlayoffMatches($teams, $name = 'tournoi')
     {
-        $this->nextStep = "playoff";
 
         // Crée la poule playoff
         $playoff = new Pool();
@@ -198,7 +202,6 @@ class TournamentRegistration extends Component
     public function generateBrackets($size)
     {
         $this->resetMatches();
-        $this->nextStep = "bracket";
 
         // Chunk les équipes
         $bracketsChunks = $this->tournament->teams->shuffle()->chunk($size);
@@ -326,7 +329,6 @@ class TournamentRegistration extends Component
         $pp = new PrecisionPool;
         $pp->pool_id = $p->id;
         $pp->save();
-        $this->nextStep = 'precision';
         return redirect('/tournaments/'.$this->tournament->id.'/precision');
     }
 

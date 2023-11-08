@@ -25,17 +25,15 @@
         </a>
     </section>
 
-    <div class="flex mt-8 md:w-2/3 m-auto gap-2">
+    <div class="flex flex-wrap mt-8 md:w-2/3 m-auto gap-2">
         <div class="border border-solid border-grey-800 border-2 md:p-8 p-2  rounded drop-shadow-sm">
-            <p class="mb-2">
-                <button
-                    {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}} {{ $tournament->teams->count() > 1 ? "" : 'disabled' }}
-                    wire:click="generate"
-                    class="bg-transparent hover:bg-orange-500 text-orange-700 font-semibold hover:text-white py-2 px-4 border border-orange-500 hover:border-transparent rounded
-                            disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
-                    {{ __('Generate') }}
-                </button>
-            </p>
+            <button
+                {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}} {{ $tournament->teams->count() > 1 ? "" : 'disabled' }}
+                wire:click="generate"
+                class="bg-transparent hover:bg-orange-500 text-orange-700 font-semibold hover:text-white py-2 px-4 border border-orange-500 hover:border-transparent rounded
+                        disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
+                {{ __('Generate') }}
+            </button>
             <button {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}}
                     wire:click="resetTeams" {{ $tournament->teams->count() ? "" : 'disabled' }}
                     class="mb-1 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded
@@ -49,6 +47,16 @@
                     disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
                 {{ __('Delete matches') }}
             </button>
+
+            <a href="/tournaments/{{ $tournament->id }}/{{ $nextStep }}">
+                <button {{ $tournament->matches->count() ? '' : 'disabled' }}
+                    class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded
+                    disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
+
+                {{ __('Next') }} >
+                </button>
+            </a>
+
 
             @if(!$tournament->matches->count())
                 <h3 class="font-bold mt-2">{{ __('Add team') }}</h3>
@@ -74,41 +82,36 @@
                         </button>
                     </div>
                 </div>
-                @if(count($tournament->teams))
-                    <h3 class="font-bold mt-2">{{ __('Teams') }} ({{ $tournament->teams->count() }})</h3>
-                    <div class="flex flex-wrap gap-4 md:m-4">
-                        @foreach($tournament->teams as $team)
-                            <div class="border border-gray-300 p-4">
-                                <div class="flex">
-                                    <p class="text-lg font-bold p-2">{{ $team->label }}</p>
-                                    <button wire:click="removeTeam({{ $team->id }})"
-                                            class="bg-transparent hover:bg-red-500 text-red-500 hover:text-white px-2 border border-2 border-red-500 hover:border-transparent rounded text-lg self-start">
-                                        x
-                                    </button>
-                                </div>
-
-                                <hr class="border border-1 border-gray-500 mb-2">
-                                @foreach($team->players as $player)
-                                    <p class="ml-3">{{ $player->name }}</p>
-                                @endforeach
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="mt-4">{{ __('No team registered') }}</p>
-                @endif
-            @endif
-            @if($tournament->matches->count())
-                <section class="">
-                    <a href="/tournaments/{{ $tournament->id }}/{{ $nextStep }}">
-                        <button
-                            class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded">
-                            {{ __('Next') }} >
-                        </button>
-                    </a>
-                </section>
             @endif
         </div>
+        @if(count($tournament->teams))
+            <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
+                <h3 class="font-bold mt-2">{{ __('Teams') }} ({{ $tournament->teams->count() }})</h3>
+                <div class="flex flex-wrap gap-4 md:m-4">
+                    @foreach($tournament->teams as $team)
+                        <div class="border border-gray-500 rounded pb-2">
+                            <div class="flex justify-between">
+                                <p class="text-lg font-bold p-2">{{ $team->label }}</p>
+                                <button wire:click="removeTeam({{ $team->id }})"
+                                        class="text-center bg-transparent hover:bg-red-500 text-red-500 hover:text-white
+                                        w-5 h-5 mt-3 mr-2  border border-2 border-red-500 hover:border-transparent rounded">
+                                </button>
+                            </div>
+
+                            <hr class="border border-1 border-gray-500 mb-2">
+                            @foreach($team->players as $player)
+                                <p class="mx-5">{{ $player->name }}</p>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+            @else
+                <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
+                    <p class="mt-4">{{ __('No team registered') }}</p>
+                </section>
+            @endif
+
         @if($tournament->brackets->count())
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
                 <h1 class="text-xl font-bold">

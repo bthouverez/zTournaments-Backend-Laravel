@@ -26,4 +26,9 @@ class Pool extends Model
     {
         return $this->hasOne(PrecisionPool::class);
     }
+
+    public function results()
+    {
+
+    }
 }

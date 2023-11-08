@@ -32,9 +32,10 @@ class TournamentBracket extends Component
 
     }
 
-    public function selectMatch($match)
+    public function selectMatch($match_id)
     {
-        if ($match['team_1'] and $match['team_2'])
+        $match = Game::find($match_id);
+        if ($match->team_1 and $match->team_2)
             $this->selected_match_id = $match['id'];
         else $this->selected_match_id = 0;
     }
