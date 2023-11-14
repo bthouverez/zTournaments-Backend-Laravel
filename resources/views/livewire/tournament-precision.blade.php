@@ -1,4 +1,4 @@
-<div class="md:w-96 m-auto">
+<div class="md:w-96 m-auto dark:text-gray-200">
     <a href="/Tir-de-precision2020.pdf">Règlement</a>
     {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
     @if($pool->current_activity < 6)
@@ -40,7 +40,8 @@
 
     @if($pool->current_activity < 6)
         <div class="mt-4">
-            <img src="/score_activity_{{ $pool->current_activity }}.png" alt="score activity {{ $pool->current_activity }}" />
+            <img src="/score_activity_{{ $pool->current_activity }}.png"
+                 alt="score activity {{ $pool->current_activity }}"/>
         </div>
     @endif
 </div>

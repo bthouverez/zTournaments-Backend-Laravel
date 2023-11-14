@@ -26,4 +26,12 @@ class Pool extends Model
     {
         return $this->hasOne(PrecisionPool::class);
     }
+
+    public function results()
+    {
+        if(!$this->matches->map->isPlayed()->contains(false)) {
+            return $this->bracket_teams->sortByDesc('score')->values();
+        }
+        return false;
+    }
 }

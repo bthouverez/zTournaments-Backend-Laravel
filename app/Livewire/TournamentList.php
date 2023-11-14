@@ -37,6 +37,13 @@ class TournamentList extends Component
 
     public function createTournament()
     {
+        $this->validate([
+            'team_size' => 'required',
+            'has_brackets' => 'required',
+            'date' => 'required',
+            'label' => 'required|min:3',
+            'place' => 'required|min:3',
+        ]);
         $t = new Tournament;
         $t->label = $this->label;
         $t->place = $this->place;
