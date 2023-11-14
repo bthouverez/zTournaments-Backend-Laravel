@@ -1,7 +1,7 @@
 <div>
     <section class="md:w-2/3 m-auto">
-        <h1 class="text-2xl font-extrabold">{{ __('Registration') }} - {{ $tournament->label }}</h1>
-        <h2>@if($tournament->team_size == 0)
+        <h1 class="text-2xl font-extrabold dark:text-gray-200">{{ __('Registration') }} - {{ $tournament->label }}</h1>
+        <h2 class="dark:text-gray-200">@if($tournament->team_size == 0)
                 {{ __('Precision') }}
             @else
                 @if($tournament->team_size == 1)
@@ -61,7 +61,7 @@
 
 
             @if(!$tournament->matches->count())
-                <h3 class="font-bold mt-2">{{ __('Add team') }}</h3>
+                <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Add team') }}</h3>
                 <div class="flex gap-2">
                     <div class="flex flex-col gap-2">
                         <input wire:keydown.enter="addTeam"
@@ -88,12 +88,12 @@
         </div>
         @if(count($tournament->teams))
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
-                <h3 class="font-bold mt-2">{{ __('Teams') }} ({{ $tournament->teams->count() }})</h3>
+                <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Teams') }} ({{ $tournament->teams->count() }})</h3>
                 <div class="flex flex-wrap gap-4 md:m-4">
                     @foreach($tournament->teams as $team)
                         <div class="border border-gray-500 rounded pb-2">
                             <div class="flex justify-between">
-                                <p class="text-lg font-bold p-2">{{ $team->label }}</p>
+                                <p class="text-lg font-bold p-2 dark:text-gray-200">{{ $team->label }}</p>
                                 <button wire:click="removeTeam({{ $team->id }})"
                                         class="text-center bg-transparent hover:bg-red-500 text-red-500 hover:text-white
                                         w-5 h-5 mt-3 mr-2  border border-2 border-red-500 hover:border-transparent rounded">
@@ -102,7 +102,7 @@
 
                             <hr class="border border-1 border-gray-500 mb-2">
                             @foreach($team->players as $player)
-                                <p class="mx-5">{{ $player->name }}</p>
+                                <p class="mx-5 dark:text-gray-200">{{ $player->name }}</p>
                             @endforeach
                         </div>
                     @endforeach
@@ -110,23 +110,23 @@
             </section>
             @else
                 <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
-                    <p class="mt-4">{{ __('No team registered') }}</p>
+                    <p class="mt-4 dark:text-gray-200">{{ __('No team registered') }}</p>
                 </section>
             @endif
 
         @if($tournament->brackets->count())
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
-                <h1 class="text-xl font-bold">
+                <h1 class="text-xl font-bold dark:text-gray-200">
                     {{ __('Pools') }} ({{ $tournament->brackets->count() }})
                 </h1>
                 <ul>
                     @php($cpt=0)
                     @foreach($tournament->brackets->sortBy('label') as $bracket)
-                        <li><strong>{{ __('Pool') }} {{ $bracket->label }}, {{ __('Fields') }} {{ ++$cpt }}
+                        <li><strong class="dark:text-gray-200">{{ __('Pool') }} {{ $bracket->label }}, {{ __('Fields') }} {{ ++$cpt }}
                                 & {{ ++$cpt }}</strong>
                             @foreach($bracket->bracket_teams as $team)
                                 <ul>
-                                    <li>{{ $team->label }}</li>
+                                    <li class="dark:text-gray-200">{{ $team->label }}</li>
                                 </ul>
                             @endforeach
                         </li>
@@ -137,13 +137,13 @@
 
         @if($tournament->brackets->count())
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
-                <h1 class="text-xl font-bold">{{ __('Pools matches') }}</h1>
+                <h1 class="text-xl font-bold dark:text-gray-200">{{ __('Pools matches') }}</h1>
                 @foreach($tournament->brackets as $bracket)
-                    <strong>{{ __('Pool') }} {{ $bracket->label }}</strong>
+                    <strong class="dark:text-gray-200">{{ __('Pool') }} {{ $bracket->label }}</strong>
                     <ul>
                         @foreach($bracket->matches as $match)
                             @if(isset($match->team_1->label))
-                                <li>{{ isset($match->team_1->label) ? $match->team_1->label : 'indéfini' }}
+                                <li class="dark:text-gray-200">{{ isset($match->team_1->label) ? $match->team_1->label : 'indéfini' }}
                                     vs
                                     {{ isset($match->team_2->label) ? $match->team_2->label : 'indéfini' }}
                                 </li>
@@ -156,11 +156,11 @@
 
         @if($tournament->playoff)
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
-                <h1 class="text-xl font-bold">{{ __('Playoff matches') }}</h1>
+                <h1 class="text-xl font-bold dark:text-gray-200">{{ __('Playoff matches') }}</h1>
                 <ul>
                     @foreach($tournament->playoff->matches as $match)
                         @if(isset($match->team_1->label))
-                            <li>{{ isset($match->team_1->label) ? $match->team_1->label : 'indéfini' }}
+                            <li class="dark:text-gray-200">{{ isset($match->team_1->label) ? $match->team_1->label : 'indéfini' }}
                                 vs
                                 {{ isset($match->team_2->label) ? $match->team_2->label : 'indéfini' }}
                             </li>

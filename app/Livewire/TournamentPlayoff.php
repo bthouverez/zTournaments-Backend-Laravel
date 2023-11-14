@@ -2,108 +2,27 @@
 
 namespace App\Livewire;
 
-use App\Models\Game;
-use App\Models\Team;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class TournamentPlayoff extends Component
 {
+
     public Tournament $tournament;
     public Collection $matches;
-    public int $selected_match_id;
-    public $score_team_1;
-    public $score_team_2;
+    protected array $matchLabels = [
+        'Finale', 'Demi-finale', 'Quart de finale', 'Huitième de finale', 'Seizième de finale',
+        'Trente-deuxième de finale'
+    ];
 
     public function mount(Tournament $tournament)
     {
         $this->tournament = $tournament;
         $this->matches = $tournament->playoff->matches;
-        $this->selected_match_id = 0;
     }
 
-    public function selectMatch($match_id)
-    {
-        $match = Game::find($match_id);
-        if ($match->team_1 and $match->team_2)
-            $this->selected_match_id = $match['id'];
-        else $this->selected_match_id = 0;
-    }
-    public function setScore()
-    {
-        $match = Game::find($this->selected_match_id);
-        $match->team_1_score = $this->score_team_1;
-        $match->team_2_score = $this->score_team_2;
-        $match->save();
-        $winner_id = $this->score_team_1 == 13 ? $match->team_1_id : $match->team_2_id;
-        $loser_id = $this->score_team_1 == 13 ? $match->team_2_id : $match->team_1_id;
-        $winner = Team::find($winner_id);
-        $winner->score += 2;
-        $winner->save();
-        $loser = Team::find($loser_id);
-        $loser->score -= 1;
-        $loser->save();
 
-        $this->selected_match_id = 0;
-
-        // MEt à jour les équipes des matchs suivants
-        $winner_match = $match->winner_next_match;
-        if ($winner_match) {
-            if ($winner_match->team_1) $winner_match->team_2_id = $winner_id;
-            else $winner_match->team_1_id = $winner_id;
-            $winner_match->save();
-        }
-
-        $loser_match = $match->loser_next_match;
-        if ($loser_match) {
-            if ($loser_match->team_1) $loser_match->team_2_id = $loser_id;
-            else $loser_match->team_1_id = $loser_id;
-            $loser_match->save();
-        }
-        return redirect('/tournaments/'.$this->tournament->id.'/playoff');
-    }
-
-    public function resetScore()
-    {
-        $match = Game::find($this->selected_match_id);
-        $winner_id = $match->team_1_score == 13 ? $match->team_1_id : $match->team_2_id;
-        $loser_id = $match->team_1_score == 13 ? $match->team_2_id : $match->team_1_id;
-        $winner = Team::find($winner_id);
-        $winner->score -= 2;
-        $winner->save();
-        $loser = Team::find($loser_id);
-        $loser->score += 1;
-        $loser->save();
-
-        $next_match_winner = $match->winner_next_match;
-        $next_match_loser = $match->loser_next_match;
-        if ($next_match_winner) {
-            if ($next_match_winner->team_1_id == $winner_id) {
-                $next_match_winner->team_1_id = $next_match_winner->team_2_id;
-            }
-            $next_match_winner->team_2_id = null;
-            $next_match_winner->team_1_score = 0;
-            $next_match_winner->team_2_score = 0;
-            $next_match_winner->save();
-        }
-
-        if ($next_match_loser) {
-            if ($next_match_loser->team_1_id == $loser_id) {
-                $next_match_loser->team_1_id = $next_match_loser->team_2_id;
-            }
-            $next_match_loser->team_2_id = null;
-            $next_match_loser->team_1_score = 0;
-            $next_match_loser->team_2_score = 0;
-            $next_match_loser->save();
-        }
-
-        $match->team_1_score = 0;
-        $match->team_2_score = 0;
-        $match->save();
-        return redirect('/tournaments/'.$this->tournament->id.'/playoff');
-
-    }
     public function render()
     {
         return view('livewire.tournament-playoff');
