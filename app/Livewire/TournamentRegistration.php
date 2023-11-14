@@ -26,12 +26,15 @@ class TournamentRegistration extends Component
         $this->newPlayer1 = "";
         $this->newPlayer2 = "";
         $this->newPlayer3 = "";
-        if($tournament->team_size == 0)
+        if ($tournament->team_size == 0) {
             $this->nextStep = "precision";
-        else if($tournament->has_brackets)
-            $this->nextStep = "bracket";
-        else
-            $this->nextStep = "playoff";
+        } else {
+            if ($tournament->has_brackets) {
+                $this->nextStep = "bracket";
+            } else {
+                $this->nextStep = "playoff";
+            }
+        }
         $this->teamsCount = $this->tournament->teams->count();
     }
 
@@ -43,19 +46,19 @@ class TournamentRegistration extends Component
         $player3 = null;
 
         // Ajoute le joueur 1
-        if($this->newPlayer1) {
+        if ($this->newPlayer1) {
             $player1 = new Player();
             $player1->name = ucwords($this->newPlayer1);
         }
 
         // Ajoute le joueur 2
-        if($this->newPlayer2) {
+        if ($this->newPlayer2) {
             $player2 = new Player();
             $player2->name = ucwords($this->newPlayer2);
         }
 
         // Ajoute le joueur 3
-        if($this->newPlayer3) {
+        if ($this->newPlayer3) {
             $player3 = new Player();
             $player3->name = ucwords($this->newPlayer3);
         }
@@ -66,17 +69,17 @@ class TournamentRegistration extends Component
         $team->tournament_id = $this->tournament->id;
         $team->save();
 
-        if($player1) {
+        if ($player1) {
             $player1->team_id = $team->id;
             $player1->save();
         }
 
-        if($player2) {
+        if ($player2) {
             $player2->team_id = $team->id;
             $player2->save();
         }
 
-        if($player3) {
+        if ($player3) {
             $player3->team_id = $team->id;
             $player3->save();
         }
@@ -90,115 +93,32 @@ class TournamentRegistration extends Component
 
     public function generate()
     {
-        if($this->tournament->team_size == 0) {
+        if ($this->tournament->team_size == 0) {
             $this->generatePrecision();
-        } else if($this->tournament->has_brackets) {
-            $this->generateBrackets(4);
         } else {
-            $this->generatePlayoff();
-        }
-    }
-
-    public function generatePlayoffMatches($teams, $name = 'tournoi')
-    {
-
-        // Crée la poule playoff
-        $playoff = new Pool();
-        $playoff->label = $name;
-        $playoff->tournament_id = $this->tournament->id;
-        $playoff->type = 2;
-        $playoff->save();
-
-
-        // TODO réparer ce truc crado
-        $g = new Game();
-        $g->tournament_id = $this->tournament->id;
-        $g->pool_id = 1;
-        $g->save();
-        $match_start_id = $g->id + 1;
-        $g->delete();
-
-        $next_matches = [];
-        $same_team_matches = [];
-
-        // Vérifie le nombre d'équipes, puissance de 2 ou non
-        $cpt = 1;
-        while ($cpt <= count($teams))
-            $cpt *= 2;
-        $cpt /= 2;
-        $chunks = array_chunk($teams, $cpt);
-
-
-        /// PREMIER TOUR, AVEC EQUIPES
-        // Si le nombre d'équipes n'est pas une puissance de 2
-        if (isset($chunks[1])) {
-            for ($ii = 0; $ii < $cpt; $ii++) {
-                $match = new Game();
-                $match->tournament_id = $this->tournament->id;
-                $match->pool_id = $playoff->id;
-                $match->team_1_id = $chunks[0][$ii]->id;
-                // Si le second chunk contient toujours une valeur, crée le match avec l'équipe correspondante
-                // Sinon crée un match avec la même équipe
-                if (isset($chunks[1][$ii])) {
-                    $match->team_2_id = $chunks[1][$ii]->id;
-                } else {
-                    $match->team_2_id = $chunks[0][$ii]->id;
-                    $same_team_matches[] = $match;
-                }
-                $match->loser_next_match_id = 0;
-                $match->winner_next_match_id = $match_start_id + $cpt + floor(($ii) / 2);
-                if (!in_array($match->winner_next_match_id, $next_matches)) $next_matches[] = $match->winner_next_match_id;
-                $match->save();
-            }
-
-
-        } else {
-            foreach (array_chunk($teams, 2) as $ii => $chunk) {
-                $match = new Game();
-                $match->tournament_id = $this->tournament->id;
-                $match->pool_id = $playoff->id;
-                $match->team_1_id = $chunk[0]->id;
-                $match->team_2_id = $chunk[1]->id;
-                $match->loser_next_match_id = 0;
-                $match->winner_next_match_id = $match_start_id + intval(count($teams) / 2 + floor(($ii) / 2));
-                if (!in_array($match->winner_next_match_id, $next_matches)) $next_matches[] = $match->winner_next_match_id;
-                $match->save();
-            }
-        }
-
-        /// AUTRE TOURS, EQUIPES INDEFINIES
-        while (count($next_matches) > 1) {
-            $data = [];
-            $match_start_id = $next_matches[0];
-            foreach ($next_matches as $ii => $match_id) {
-                $match = new Game();
-                $match->tournament_id = $this->tournament->id;
-                $match->pool_id = $playoff->id;
-                $match->loser_next_match_id = 0;
-                $match->winner_next_match_id = $match_start_id + intval(count($next_matches) + floor(($ii) / 2));
-                if (!in_array($match->winner_next_match_id, $data)) $data[] = $match->winner_next_match_id;
-                $match->save();
-            }
-            $next_matches = $data;
-        }
-        $match = new Game();
-        $match->tournament_id = $this->tournament->id;
-        $match->pool_id = $playoff->id;
-        $match->winner_next_match_id = 0;
-        $match->loser_next_match_id = 0;
-        $match->save();
-        // MISE A JOUR DES MATCHES QUAND PAS UNE PUISSANCE DE 2
-        foreach ($same_team_matches as $match) {
-            $next_match = $match->winner_next_match;
-            if ($next_match->team_1_id) {
-                $next_match->team_2_id = $match->team_1_id;
+            if ($this->tournament->has_brackets) {
+                $this->generateBrackets(4);
             } else {
-                $next_match->team_1_id = $match->team_1_id;
+                $this->generatePlayoff();
             }
-            $match->save();
-            $next_match->save();
         }
     }
+
+    public function generatePrecision()
+    {
+        if (!$this->tournament->precision->count()) {
+            $p = new Pool;
+            $p->tournament_id = $this->tournament->id;
+            $p->label = 'precision';
+            $p->type = 3;
+            $p->save();
+            $pp = new PrecisionPool;
+            $pp->pool_id = $p->id;
+            $pp->save();
+        }
+        return redirect('/tournaments/'.$this->tournament->id.'/precision');
+    }
+
     public function generateBrackets($size)
     {
         $this->resetMatches();
@@ -218,7 +138,7 @@ class TournamentRegistration extends Component
             $nbMissingTeams--;
             for ($ii = 0; $ii < $nbMissingTeams; $ii++) {
                 $team = new Team();
-                $team->label = "Exempt " . $ii + 2;
+                $team->label = "Exempt ".$ii + 2;
                 $team->tournament_id = $this->tournament->id;
                 $team->save();
                 $bracketsChunks[$lastChunkId][] = $bracketsChunks[$ii]->pop();
@@ -287,13 +207,149 @@ class TournamentRegistration extends Component
             $m->save();
         }
     }
+
+    public function resetMatches()
+    {
+        Game::where('tournament_id', $this->tournament->id)->delete();
+//        $t_pools = Pool::where('tournament_id', $this->tournament->id)->get()->map->id->toArray();
+//        PrecisionPool::whereIn('pool_id', $t_pools)->delete();
+        Pool::where('tournament_id', $this->tournament->id)->delete();
+    }
+
     public function generatePlayoff()
     {
         $teamsArray = [];
-        foreach ($this->tournament->teams->shuffle() as $team)
+        foreach ($this->tournament->teams->shuffle() as $team) {
             $teamsArray[] = $team;
+        }
         $this->generatePlayoffMatches($teamsArray, 'principal');
     }
+
+    public function generatePlayoffMatches($teams, $name = 'tournoi')
+    {
+
+        // Crée la poule playoff
+        $playoff = new Pool();
+        $playoff->label = $name;
+        $playoff->tournament_id = $this->tournament->id;
+        $playoff->type = 2;
+        $playoff->save();
+
+
+        // TODO réparer ce truc crado
+        $g = new Game();
+        $g->tournament_id = $this->tournament->id;
+        $g->pool_id = 1;
+        $g->save();
+        $match_start_id = $g->id + 1;
+        $g->delete();
+
+        $next_matches = [];
+        $same_team_matches = [];
+
+        // Vérifie le nombre d'équipes, puissance de 2 ou non
+        $cpt = 1;
+        while ($cpt <= count($teams)) {
+            $cpt *= 2;
+        }
+        $cpt /= 2;
+        $chunks = array_chunk($teams, $cpt);
+
+
+        /// PREMIER TOUR, AVEC EQUIPES
+        // Si le nombre d'équipes n'est pas une puissance de 2
+        if (isset($chunks[1])) {
+            for ($ii = 0; $ii < $cpt; $ii++) {
+                $match = new Game();
+                $match->tournament_id = $this->tournament->id;
+                $match->pool_id = $playoff->id;
+                $match->team_1_id = $chunks[0][$ii]->id;
+                // Si le second chunk contient toujours une valeur, crée le match avec l'équipe correspondante
+                // Sinon crée un match avec la même équipe
+                if (isset($chunks[1][$ii])) {
+                    $match->team_2_id = $chunks[1][$ii]->id;
+                } else {
+                    $match->team_2_id = $chunks[0][$ii]->id;
+                    $same_team_matches[] = $match;
+                }
+                $match->loser_next_match_id = 0;
+                $match->winner_next_match_id = $match_start_id + $cpt + floor(($ii) / 2);
+                if (!in_array($match->winner_next_match_id, $next_matches)) {
+                    $next_matches[] = $match->winner_next_match_id;
+                }
+                $match->save();
+            }
+
+
+        } else {
+            foreach (array_chunk($teams, 2) as $ii => $chunk) {
+                $match = new Game();
+                $match->tournament_id = $this->tournament->id;
+                $match->pool_id = $playoff->id;
+                $match->team_1_id = $chunk[0]->id;
+                $match->team_2_id = $chunk[1]->id;
+                $match->loser_next_match_id = 0;
+                $match->winner_next_match_id = $match_start_id + intval(count($teams) / 2 + floor(($ii) / 2));
+                if (!in_array($match->winner_next_match_id, $next_matches)) {
+                    $next_matches[] = $match->winner_next_match_id;
+                }
+                $match->save();
+            }
+        }
+
+        /// AUTRE TOURS, EQUIPES INDEFINIES
+        while (count($next_matches) > 1) {
+            $data = [];
+            $match_start_id = $next_matches[0];
+            foreach ($next_matches as $ii => $match_id) {
+                $match = new Game();
+                $match->tournament_id = $this->tournament->id;
+                $match->pool_id = $playoff->id;
+                $match->loser_next_match_id = 0;
+                $match->winner_next_match_id = $match_start_id + intval(count($next_matches) + floor(($ii) / 2));
+                if (!in_array($match->winner_next_match_id, $data)) {
+                    $data[] = $match->winner_next_match_id;
+                }
+                $match->save();
+            }
+            $next_matches = $data;
+        }
+        $match = new Game();
+        $match->tournament_id = $this->tournament->id;
+        $match->pool_id = $playoff->id;
+        $match->winner_next_match_id = 0;
+        $match->loser_next_match_id = 0;
+        $match->save();
+        // MISE A JOUR DES MATCHES QUAND PAS UNE PUISSANCE DE 2
+        foreach ($same_team_matches as $match) {
+            $next_match = $match->winner_next_match;
+            if ($next_match->team_1_id) {
+                $next_match->team_2_id = $match->team_1_id;
+            } else {
+                $next_match->team_1_id = $match->team_1_id;
+            }
+            $match->save();
+            $next_match->save();
+        }
+    }
+
+    public function removeTeam(int $id)
+    {
+        Player::where('team_id', $id)->delete();
+        Team::find($id)->delete();
+    }
+
+    public function resetTeams()
+    {
+        $this->resetMatches();
+        // Supprime les joueurs des poules du tournoi
+        $t_teams = Team::where('tournament_id', $this->tournament->id)->get()->map->id->toArray();
+        Player::whereIn('team_id', $t_teams)->delete();
+        // Supprime les équipes du tournoi
+        Team::where('tournament_id', $this->tournament->id)->delete();
+        $this->teamsCount = 0;
+    }
+
     public function generatePlayoffFromBrackets()
     {
         $data = [];
@@ -318,42 +374,6 @@ class TournamentRegistration extends Component
         }
 
         $this->generatePlayoffMatches($tournoi_principal, 'principal');
-    }
-    public function generatePrecision()
-    {
-        if (!$this->tournament->precision->count()) {
-            $p = new Pool;
-            $p->tournament_id = $this->tournament->id;
-            $p->label = 'precision';
-            $p->type = 3;
-            $p->save();
-            $pp = new PrecisionPool;
-            $pp->pool_id = $p->id;
-            $pp->save();
-        }
-        return redirect('/tournaments/'.$this->tournament->id.'/precision');
-    }
-
-    public function removeTeam(int $id) {
-        Player::where('team_id', $id)->delete();
-        Team::find($id)->delete();
-    }
-
-    public function resetTeams()
-    {
-        $this->resetMatches();
-        // Supprime les joueurs
-        foreach (Player::all()->where('tournament_id', $this->tournament->id) as $player) {
-            $player->delete();
-        }
-        // Supprime les équipes
-        Team::where('tournament_id', $this->tournament->id)->delete();
-        $this->teamsCount = 0;
-    }
-    public function resetMatches()
-    {
-        Game::where('tournament_id', $this->tournament->id)->delete();
-        Pool::where('tournament_id', $this->tournament->id)->delete();
     }
 
     public function render()
