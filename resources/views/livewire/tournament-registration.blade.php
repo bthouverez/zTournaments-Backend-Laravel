@@ -61,9 +61,9 @@
 
 
             @if(!$tournament->matches->count())
-                <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Add team') }}</h3>
-                <div class="flex gap-2">
+                <div class="flex gap-8 justify-between">
                     <div class="flex flex-col gap-2">
+                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Add team') }}</h3>
                         <input wire:keydown.enter="addTeam"
                                class="shadow appearance-none border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline"
                                type="text" wire:model.lazy="newPlayer1" placeholder="{{ __('Player') }} 1">
@@ -83,13 +83,25 @@
                             {{ __('Add') }}
                         </button>
                     </div>
+                    <div class="flex flex-col gap-2">
+
+                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Load file') }}</h3>
+                        <form wire:submit="loadPlayersFile" class="flex flex-col gap-2">
+                            <input type="file" wire:model="playersListFile">
+                            <button
+                                class="bg-transparent hover:bg-teal-500 text-teal-700 font-semibold hover:text-white py-2 px-3 border border-teal-500 hover:border-transparent rounded">
+                                {{ __('Load') }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @endif
         </div>
-        @if(count($tournament->teams))
+        @if(count($tournament->teams->sortBy('label')))
             <section class="border border-solid border-grey-800 border-2 md:p-8 rounded drop-shadow-sm">
                 <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Teams') }} ({{ $tournament->teams->count() }})</h3>
                 <div class="flex flex-wrap gap-4 md:m-4">
+                    @dd($tournament->teams);
                     @foreach($tournament->teams as $team)
                         <div class="border border-gray-500 rounded pb-2">
                             <div class="flex justify-between">

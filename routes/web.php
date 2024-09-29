@@ -19,6 +19,12 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('test', function() {
+//    dd(\Illuminate\Support\Facades\Storage::get('tmpTab.xlsx'));
+    dd(storage_path());
+
+});
+
 if (env('APP_ENV') == 'local') {
     Auth::login(User::find(1));
 }
