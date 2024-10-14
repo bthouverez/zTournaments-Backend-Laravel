@@ -19,6 +19,8 @@ class MatchCard extends Component
         $this->match = $match;
         $this->selectedMatchId = 0;
         $this->label = $label;
+        $this->score_team_1 = 0;
+        $this->score_team_2 = 0;
     }
 
 
@@ -35,8 +37,8 @@ class MatchCard extends Component
         $match->team_1_score = $this->score_team_1;
         $match->team_2_score = $this->score_team_2;
         $match->save();
-        $winner_id = $this->score_team_1 == 13 ? $match->team_1_id : $match->team_2_id;
-        $loser_id = $this->score_team_1 == 13 ? $match->team_2_id : $match->team_1_id;
+        $winner_id = $this->score_team_1 > $this->score_team_2 ? $match->team_1_id : $match->team_2_id;
+        $loser_id = $this->score_team_1 > $this->score_team_2 ? $match->team_2_id : $match->team_1_id;
         $winner = Team::find($winner_id);
         $winner->score += 2;
         $winner->save();

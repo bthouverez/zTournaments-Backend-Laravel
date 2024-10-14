@@ -35,6 +35,6 @@ class Game extends Model
     }
 
     public function isPLayed() {
-        return $this->team_1_score == 13 OR $this->team_2_score == 13;
+        return $this->team_1_score != 0 OR $this->team_2_score != 0;
     }
 }

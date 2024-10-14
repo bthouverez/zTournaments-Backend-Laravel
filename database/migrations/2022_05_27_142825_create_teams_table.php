@@ -16,6 +16,7 @@ class CreateTeamsTable extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('label');
+            $table->integer('number')->default(0);
             $table->unsignedBigInteger('bracket_id')->nullable();
 //            $table->foreignId('bracket_id')->nullable()->constrained(
 //                table: 'pools', indexName: 'team_bracket_id'

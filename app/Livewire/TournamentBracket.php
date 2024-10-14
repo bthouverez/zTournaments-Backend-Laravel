@@ -9,6 +9,7 @@ use Livewire\Component;
 
 class TournamentBracket extends Component
 {
+
     public Tournament $tournament;
     public Collection $matches;
     protected array $matchLabels = [

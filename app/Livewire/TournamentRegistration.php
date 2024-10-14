@@ -75,6 +75,7 @@ class TournamentRegistration extends Component
         // Crée l'équipe
         $team = new Team();
         $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team') . ' ' . ++$this->teamsCount;
+        $team->number = $this->teamsCount;
         $team->tournament_id = $this->tournament->id;
         $team->save();
 
@@ -100,7 +101,7 @@ class TournamentRegistration extends Component
     }
 
 
-    public function loadPlayersFile()
+    public function loadPlayersFile() : void
     {
         $this->playersListFile->storeAs('public', 'tmpTab.xlsx');
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('storage/tmpTab.xlsx');
@@ -118,6 +119,7 @@ class TournamentRegistration extends Component
             $team = new Team();
 //            $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team') . ' ' . ++$this->teamsCount;
             $team->label = __('Team') . ' ' . ++$this->teamsCount;
+            $team->number = $this->teamsCount;
             $team->tournament_id = $this->tournament->id;
             $team->save();
 

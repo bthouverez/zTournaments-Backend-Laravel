@@ -9,6 +9,8 @@ class Player extends Model
 {
     use HasFactory;
 
+    public mixed $team_id;
+
     public function team()
     {
         return $this->belongsTo(Team::class);
