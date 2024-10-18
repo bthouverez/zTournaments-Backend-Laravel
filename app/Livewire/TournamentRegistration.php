@@ -8,10 +8,17 @@ use App\Models\Pool;
 use App\Models\PrecisionPool;
 use App\Models\Team;
 use App\Models\Tournament;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class TournamentRegistration extends Component
 {
+    use WithFileUploads;
+
     public Tournament $tournament;
     public string $newPlayer1;
     public string $newPlayer2;
@@ -19,6 +26,7 @@ class TournamentRegistration extends Component
     public int $teamsCount;
     public string $nextStep;
 
+    public $playersListFile;
 
     public function mount(Tournament $tournament)
     {
@@ -26,6 +34,7 @@ class TournamentRegistration extends Component
         $this->newPlayer1 = "";
         $this->newPlayer2 = "";
         $this->newPlayer3 = "";
+        $this->playersListFile = "";
         if ($tournament->team_size == 0) {
             $this->nextStep = "precision";
         } else {
@@ -65,7 +74,8 @@ class TournamentRegistration extends Component
 
         // Crée l'équipe
         $team = new Team();
-        $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team').' '.++$this->teamsCount;
+        $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team') . ' ' . ++$this->teamsCount;
+        $team->number = $this->teamsCount;
         $team->tournament_id = $this->tournament->id;
         $team->save();
 
@@ -90,6 +100,50 @@ class TournamentRegistration extends Component
         $this->newTeam = "";
     }
 
+
+    public function loadPlayersFile() : void
+    {
+        $this->playersListFile->storeAs('public', 'tmpTab.xlsx');
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('storage/tmpTab.xlsx');
+        $sheet = $spreadsheet->getActiveSheet();
+        $this->teamsCount = 0;
+        $nLigne = 2;
+        while (true) {
+            $p1 = $sheet->getCell('B' . $nLigne)->getValue();
+            $p2 = $sheet->getCell('C' . $nLigne)->getValue();
+            $p3 = $sheet->getCell('D'.$nLigne)->getValue();
+
+            if ($p1 == null) break;
+
+            // Crée l'équipe
+            $team = new Team();
+//            $team->label = $this->tournament->team_size <= 1 ? $player1->name : __('Team') . ' ' . ++$this->teamsCount;
+            $team->label = __('Team') . ' ' . ++$this->teamsCount;
+            $team->number = $this->teamsCount;
+            $team->tournament_id = $this->tournament->id;
+            $team->save();
+
+            $player1 = new Player();
+            $player1->name = ucwords($p1);
+            $player1->team_id = $team->id;
+            $player1->save();
+
+            if($this->tournament->team_size > 1) {
+                $player2 = new Player();
+                $player2->name = ucwords($p2);
+                $player2->team_id = $team->id;
+                $player2->save();
+            }
+            if($this->tournament->team_size > 2) {
+                $player3 = new Player();
+                $player3->name = ucwords($p3);
+                $player3->team_id = $team->id;
+                $player3->save();
+            }
+            $nLigne++;
+        }
+        File::delete('storage/tmpTab.xlsx');
+    }
 
     public function generate()
     {
@@ -116,7 +170,7 @@ class TournamentRegistration extends Component
             $pp->pool_id = $p->id;
             $pp->save();
         }
-        return redirect('/tournaments/'.$this->tournament->id.'/precision');
+        return redirect('/tournaments/' . $this->tournament->id . '/precision');
     }
 
     public function generateBrackets($size)
@@ -138,7 +192,7 @@ class TournamentRegistration extends Component
             $nbMissingTeams--;
             for ($ii = 0; $ii < $nbMissingTeams; $ii++) {
                 $team = new Team();
-                $team->label = "Exempt ".$ii + 2;
+                $team->label = "Exempt " . $ii + 2;
                 $team->tournament_id = $this->tournament->id;
                 $team->save();
                 $bracketsChunks[$lastChunkId][] = $bracketsChunks[$ii]->pop();

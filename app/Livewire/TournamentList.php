@@ -44,6 +44,7 @@ class TournamentList extends Component
             'label' => 'required|min:3',
             'place' => 'required|min:3',
         ]);
+
         $t = new Tournament;
         $t->label = $this->label;
         $t->place = $this->place;
@@ -52,8 +53,10 @@ class TournamentList extends Component
         $t->has_brackets = $this->has_brackets;
         $t->user_id = Auth::user()->id;
         $t->save();
+
         return redirect('/tournaments/'.$t->id.'/registration');
     }
+
     public function render()
     {
         return view('livewire.tournament-list');

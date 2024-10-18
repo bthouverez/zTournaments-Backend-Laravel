@@ -22,7 +22,7 @@
             @foreach($bracket->matches->chunk(2) as $chunk)
                 <div>
                     @foreach($chunk as $match)
-                        <livewire:match-card :$match label="{{ $this->matchLabels[$cpt++] }}">
+                        <livewire:match-card :$match key="{{ now() }}" label="{{ $this->matchLabels[$cpt++] }}">
                     @endforeach
                 </div>
             @endforeach
