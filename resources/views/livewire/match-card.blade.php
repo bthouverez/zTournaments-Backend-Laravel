@@ -12,9 +12,16 @@
         @endif
      "
      wire:click="selectMatch({{ $match }})">
-    <p class="text-xs mb-2 dark:text-gray-300">
-        {{ $label }}
-    </p>
+   <div class="flex justify-between">
+       <p class="text-xs mb-2 dark:text-gray-300">
+           {{ $label }}
+       </p>
+       @if($match->field)
+              <p class="text-xs mb-2 dark:text-gray-300">
+                Terrain {{ $match->field }}
+              </p>
+       @endif
+   </div>
     <p class="text-center dark:text-gray-300">
         <strong
             class="dark:text-gray-300">{{ isset($match->team_1->label) ? $match->team_1->label : 'indéfini' }}</strong>

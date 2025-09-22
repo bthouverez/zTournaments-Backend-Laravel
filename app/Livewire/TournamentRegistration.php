@@ -199,7 +199,9 @@ class TournamentRegistration extends Component
                 $bracketsChunks[$ii][] = $team;
             }
         }
+
         $chunksCpt = 0;
+        $fieldsCpt = 1;
         foreach ($bracketsChunks as $ii => $rawBracket) {
             // Crée un bracket par chunk
             $bracket = new Pool();
@@ -220,6 +222,7 @@ class TournamentRegistration extends Component
             $m->pool_id = $bracket->id;
             $m->team_1_id = $rawBracket->get($chunksCpt++)->id;
             $m->team_2_id = $rawBracket->get($chunksCpt++)->id;
+            $m->field = $fieldsCpt;
             $m->save();
             $start_id = $m->id;
             $m->winner_next_match_id = $start_id + 2;
@@ -232,6 +235,7 @@ class TournamentRegistration extends Component
             $m->pool_id = $bracket->id;
             $m->team_1_id = $rawBracket->get($chunksCpt++)->id;
             $m->team_2_id = $rawBracket->get($chunksCpt++)->id;
+            $m->field = $fieldsCpt+1;
             $m->winner_next_match_id = $start_id + 2;
             $m->loser_next_match_id = $start_id + 3;
             $m->save();
@@ -242,6 +246,7 @@ class TournamentRegistration extends Component
             $m->pool_id = $bracket->id;
             $m->winner_next_match_id = 0;
             $m->loser_next_match_id = $start_id + 4;
+            $m->field = $fieldsCpt;
             $m->save();
 
             // Losers match
@@ -250,6 +255,7 @@ class TournamentRegistration extends Component
             $m->pool_id = $bracket->id;
             $m->winner_next_match_id = $start_id + 4;
             $m->loser_next_match_id = 0;
+            $m->field = $fieldsCpt+1;
             $m->save();
 
             // Decider match
@@ -258,7 +264,10 @@ class TournamentRegistration extends Component
             $m->pool_id = $bracket->id;
             $m->winner_next_match_id = 0;
             $m->loser_next_match_id = 0;
+            $m->field = $fieldsCpt;
             $m->save();
+
+            $fieldsCpt += 2;
         }
     }
 

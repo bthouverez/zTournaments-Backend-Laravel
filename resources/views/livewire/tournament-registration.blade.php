@@ -85,7 +85,8 @@
                     </div>
                     <div class="flex flex-col gap-2">
 
-                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Load file') }}</h3>
+                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Load Excel') }}</h3>
+                        <p>Le premier joueur doit être inscrit dans la case B2.</p>
                         <form wire:submit="loadPlayersFile" class="flex flex-col gap-2">
                             <input type="file" wire:model="playersListFile">
                             <button

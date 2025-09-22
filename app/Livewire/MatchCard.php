@@ -35,6 +35,11 @@ class MatchCard extends Component
 
     public function setScore(Game $match)
     {
+
+        if( $this->score_team_1 == 0 and $this->score_team_2 == 0) {
+            $this->dispatch('refresh');
+            return;
+        }
         $match->team_1_score = $this->score_team_1;
         $match->team_2_score = $this->score_team_2;
         $match->save();

@@ -298,5 +298,7 @@
     "Today": "Aujourd'hui",
     "place": "lieu",
     "Pool": "Poule",
-    "Fields": "Terrains"
+    "Fields": "Terrains",
+    "Load": "Charger",
+    "Load Excel": "Charger tableau Excel"
 }

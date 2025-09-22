@@ -31,19 +31,19 @@
                     <li class="border border-black dark:border-gray-300 border-solid p-2 rounded-t-xl">
                         <strong>{{ __('Leaderboard') }}</strong>
                     </li>
-                    <x-result-item class="bg-green-900">
+                    <x-result-item class="bg-green-800">
                         <p>1</p>
                         <p>{{ $bracket->results()[0]->label }}</p>
                     </x-result-item>
-                    <x-result-item class="bg-green-900">
+                    <x-result-item class="bg-green-800">
                         <p>2</p>
                         <p>{{ $bracket->results()[1]->label }}</p>
                     </x-result-item>
-                    <x-result-item class="bg-red-900">
+                    <x-result-item class="bg-red-800">
                         <p>3</p>
                         <p>{{ $bracket->results()[2]->label }}</p>
                     </x-result-item>
-                    <x-result-item class="bg-red-900 rounded-b-xl">
+                    <x-result-item class="bg-red-800 rounded-b-xl">
                         <p>4</p>
                         <p>{{ $bracket->results()[3]->label }}</p>
                     </x-result-item>
