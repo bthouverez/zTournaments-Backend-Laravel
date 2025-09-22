@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Game;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class TournamentBracket extends Component
@@ -28,7 +29,7 @@ class TournamentBracket extends Component
 
     }
 
-
+    #[On('refresh')]
     public function render()
     {
         return view('livewire.tournament-bracket');

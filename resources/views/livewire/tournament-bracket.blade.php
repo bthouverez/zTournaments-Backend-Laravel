@@ -27,7 +27,7 @@
                 </div>
             @endforeach
             @if($bracket->results())
-                <ul class=" m-4 border border-solid border-black text-center w-40">
+                <ul class=" m-4 text-center w-40">
                     <li class="border border-black dark:border-gray-300 border-solid p-2 rounded-t-xl">
                         <strong>{{ __('Leaderboard') }}</strong>
                     </li>

@@ -45,6 +45,15 @@ class DatabaseSeeder extends Seeder
         $t->date = '2023-11-07';
         $t->team_size = 1;
         $t->user_id = 1;
+        $t->has_brackets = false;
+        $t->save();
+
+        $t = new Tournament;
+        $t->label = 'But d\'honneur';
+        $t->place = 'Civrieux';
+        $t->date = '2025-10-11';
+        $t->team_size = 1;
+        $t->user_id = 1;
         $t->has_brackets = true;
         $t->save();
 
