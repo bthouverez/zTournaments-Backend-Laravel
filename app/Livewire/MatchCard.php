@@ -74,7 +74,9 @@ class MatchCard extends Component
             }
             $loser_match->save();
         }
-
+        if($match->loser_next_match_id == 0 && $match->winner_next_match_id == 0) {
+            $this->dispatch('check-brackets-end');
+        }
         $this->dispatch('refresh');
     }
 

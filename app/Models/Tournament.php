@@ -237,6 +237,7 @@ class Tournament extends Model
 
 
         } else {
+
             foreach (array_chunk($teams, 2) as $ii => $chunk) {
                 $match = new Game();
                 $match->tournament_id = $this->id;

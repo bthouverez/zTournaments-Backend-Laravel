@@ -48,7 +48,6 @@
                     </x-button>
                 @else
                     <x-button
-                        class="bg-transparent bg-green-500 text-green-700 font-semibold hover:text-white py-1 px-2 border border-green-500 hover:border-transparent rounded"
                     >
                         Valider
                     </x-button>

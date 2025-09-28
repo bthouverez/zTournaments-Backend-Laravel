@@ -10,6 +10,21 @@
                 < {{ __('Back') }}
             </button>
         </a>
+        <button
+            {{ $ready_to_generate ? "" : 'disabled' }}
+            wire:click="generatePlayoff"
+            class="bg-transparent hover:bg-orange-500 text-orange-700 font-semibold hover:text-white py-2 px-4 border border-orange-500 hover:border-transparent rounded
+                        disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
+            {{ __('Generate playoff') }}
+        </button>
+
+        <a href="/tournaments/{{ $tournament->id }}/playoff">
+            <button {{ $playoff_generated ? '' : 'disabled' }}
+                    class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded
+                    disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
+                {{ __('Next') }} >
+            </button>
+        </a>
     </div>
     <hr class="my-4">
     @foreach($tournament->brackets as $bracket)
