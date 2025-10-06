@@ -35,7 +35,6 @@
             </button>
         </a>
     </section>
-    {{ $tournament->teams->count()}}
     <div class="flex flex-wrap mt-8 md:w-2/3 m-auto gap-2">
         <div class="border border-solid border-grey-800 border-2 md:p-8 p-2  rounded drop-shadow-sm">
             <button
