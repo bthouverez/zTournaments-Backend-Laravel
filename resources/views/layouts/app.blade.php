@@ -12,12 +12,12 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet"/>
 
     <!-- Scripts -->
-    @if(env('APP_ENV') === 'local')
+{{--    @if(env('APP_ENV') === 'local')--}}
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="/app.css">
-        <script src="/app.js"></script>
-    @endif
+{{--    @else--}}
+{{--        <link rel="stylesheet" href="/app.css">--}}
+{{--        <script src="/app.js"></script>--}}
+{{--    @endif--}}
 
     <!-- Styles -->
     @livewireStyles
