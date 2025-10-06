@@ -284,6 +284,7 @@
     "Label": "Nom",
     "Place": "Lieu",
     "Generate": "Générer",
+    "Generate playoff": "Générer tournoi",
     "Delete matches": "Supprimer matchs",
     "Delete teams": "Supprimer équipes",
     "Next": "Suivant",
@@ -298,5 +299,7 @@
     "Today": "Aujourd'hui",
     "place": "lieu",
     "Pool": "Poule",
-    "Fields": "Terrains"
+    "Fields": "Terrains",
+    "Load": "Charger",
+    "Load Excel": "Charger tableau Excel"
 }

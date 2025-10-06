@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Game;
 use App\Models\Team;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class MatchCard extends Component
@@ -34,6 +35,11 @@ class MatchCard extends Component
 
     public function setScore(Game $match)
     {
+
+        if( $this->score_team_1 == 0 and $this->score_team_2 == 0) {
+            $this->dispatch('refresh');
+            return;
+        }
         $match->team_1_score = $this->score_team_1;
         $match->team_2_score = $this->score_team_2;
         $match->save();
@@ -68,8 +74,13 @@ class MatchCard extends Component
             }
             $loser_match->save();
         }
+        if($match->loser_next_match_id == 0 && $match->winner_next_match_id == 0) {
+            $this->dispatch('check-brackets-end');
+        }
+        $this->dispatch('refresh');
     }
 
+    #[On('refresh')]
     public function render()
     {
         return view('livewire.match-card');
@@ -112,6 +123,8 @@ class MatchCard extends Component
         $match->team_1_score = 0;
         $match->team_2_score = 0;
         $match->save();
+
+        $this->dispatch('refresh');
 
     }
 

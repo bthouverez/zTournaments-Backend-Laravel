@@ -25,39 +25,42 @@
                 < {{ __('Back') }}
             </button>
         </a>
-    </section>
 
+        <a href="/tournaments/{{ $tournament->id }}/{{ $nextStep }}">
+            <button {{ $tournament->matches->count() ? '' : 'disabled' }}
+                    class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded
+                    disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
+
+                {{ __('Next') }} >
+            </button>
+        </a>
+    </section>
     <div class="flex flex-wrap mt-8 md:w-2/3 m-auto gap-2">
         <div class="border border-solid border-grey-800 border-2 md:p-8 p-2  rounded drop-shadow-sm">
             <button
-                {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}} {{ $tournament->teams->count() > 1 ? "" : 'disabled' }}
+{{--                @dump($tournament->teams->count())--}}
+
+                {{ ($tournament->teams->count() <= 1 or $tournament->matches->count()) ? 'disabled' : '' }}
                 wire:click="generate"
                 class="bg-transparent hover:bg-orange-500 text-orange-700 font-semibold hover:text-white py-2 px-4 border border-orange-500 hover:border-transparent rounded
                         disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
                 {{ __('Generate') }}
             </button>
-            <button {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}}
+            <button
+{{--                onclick="confirm('Voulez-vous vraiment supprimer les équipes ?') || event.stopImmediatePropagation()"--}}
                     wire:click="resetTeams" {{ $tournament->teams->count() ? "" : 'disabled' }}
                     class="mb-1 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded
                 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
                 {{ __('Delete teams') }}
             </button>
-
-            <button {{-- onclick="confirm('Sur ?') || event.stopImmediatePropagation()"--}}
+            <button
+{{--             onclick="confirm('Voulez-vous vraiment supprimer les matchs ?') || event.stopImmediatePropagation()"--}}
                     wire:click="resetMatches" {{ $tournament->brackets->count()  || $tournament->matches->count() ? "" : 'disabled' }}
                     class="mb-1 bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded
                     disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
                 {{ __('Delete matches') }}
             </button>
 
-            <a href="/tournaments/{{ $tournament->id }}/{{ $nextStep }}">
-                <button {{ $tournament->matches->count() ? '' : 'disabled' }}
-                    class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded
-                    disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 disabled:text-white">
-
-                {{ __('Next') }} >
-                </button>
-            </a>
 
 
             @if(!$tournament->matches->count())
@@ -85,7 +88,8 @@
                     </div>
                     <div class="flex flex-col gap-2">
 
-                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Load file') }}</h3>
+                        <h3 class="font-bold mt-2 dark:text-gray-200">{{ __('Load Excel') }}</h3>
+                        <p>Le premier joueur doit être inscrit dans la case B2.</p>
                         <form wire:submit="loadPlayersFile" class="flex flex-col gap-2">
                             <input type="file" wire:model="playersListFile">
                             <button
@@ -106,9 +110,12 @@
                         <div class="border border-gray-500 rounded pb-2">
                             <div class="flex justify-between">
                                 <p class="text-lg font-bold p-2 dark:text-gray-200">{{ $team->label }}</p>
-                                <button wire:click="removeTeam({{ $team->id }})"
+                                <button
+                                    {{ $tournament->matches->count() ? 'disabled' : '' }}
+                                    wire:click="removeTeam({{ $team->id }})"
                                         class="text-center bg-transparent hover:bg-red-500 text-red-500 hover:text-white
-                                        w-5 h-5 mt-3 mr-2  border border-2 border-red-500 hover:border-transparent rounded">
+                                        w-5 h-5 mt-3 mr-2  border border-2 border-red-500 hover:border-transparent rounded
+                                        disabled:border-0 ">
                                 </button>
                             </div>
 
