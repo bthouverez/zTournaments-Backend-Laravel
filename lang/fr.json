@@ -301,5 +301,7 @@
     "Pool": "Poule",
     "Fields": "Terrains",
     "Load": "Charger",
-    "Load Excel": "Charger tableau Excel"
+    "Load Excel": "Charger tableau Excel",
+    "Melee": "Mêlée",
+    "at melee": "à la mêlée"
 }

@@ -49,6 +49,11 @@
             </ul>
         </div>
 
+        <div class="my-4">
+            {{ __('Melee') }} ?
+            <x-checkbox wire:model="melee" name="melee" id="melee" class="mx-2"/>
+        </div>
+
         <div class="mb-4">
             @error('label') <p class="text-red-500">{{ $message }}</p> @enderror
             <x-input class="w-full"
@@ -77,36 +82,44 @@
         <h1 class="text-xl font-bold mb-3 dark:text-white">{{ __('My tournaments') }}</h1>
         <div class="flex gap-3 flex-wrap">
             @forelse($tournaments->sortByDesc('date') as $tournament)
-                <a href="/tournaments/{{ $tournament->id }}/registration"
-                   class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-200">{{ $tournament->label }}</h5>
-                    <div class="font-normal text-gray-700 dark:text-gray-400">
-                        <p class="text-xs">{{ Carbon\Carbon::parse($tournament->date)->format('j M Y') }},
-                            <span>{{ $tournament->date == date('Y-m-d') ?
+                <div
+                    class="block max-w-sm bg-white p-4 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <p class="text-right">
+                        <x-danger-button class="mb-2 " wire:confirm="{{ __('Delete') }} ?" wire:click="delete({{ $tournament->id }})">{{ __('X') }}</x-danger-button>
+                    </p>
+                    <a href="/tournaments/{{ $tournament->id }}/registration">
+                        <div>
+
+                            <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-200">{{ $tournament->label }}</h5>
+                            <div class="font-normal text-gray-700 dark:text-gray-400">
+                                <p class="text-xs">{{ Carbon\Carbon::parse($tournament->date)->format('j M Y') }},
+                                    <span>{{ $tournament->date == date('Y-m-d') ?
                         __('Today') : Carbon\Carbon::parse($tournament->date)->diffForHumans() }}</span>
-                        </p>
-                        <p>{{ $tournament->place }}</p>
-                        <p>
-                            @if($tournament->team_size == 0)
-                                {{ __('Precision') }}
-                            @else
-                                @if($tournament->team_size == 1)
-                                    {{ __('Simple') }}
-                                @elseif($tournament->team_size == 2)
-                                    {{ __('Double') }}
-                                @elseif($tournament->team_size == 3)
-                                    {{ __('Triple') }}
-                                @endif
-                                -
-                                @if($tournament->has_brackets)
-                                    {{ __('Pools') }}
-                                @else
-                                    {{ __('Playoff') }}
-                                @endif
-                            @endif
-                        </p>
-                    </div>
-                </a>
+                                </p>
+                                <p>{{ $tournament->place }}</p>
+                                <p>
+                                    @if($tournament->team_size == 0)
+                                        {{ __('Precision') }}
+                                    @else
+                                        @if($tournament->team_size == 1)
+                                            {{ __('Simple') }}
+                                        @elseif($tournament->team_size == 2)
+                                            {{ __('Double') }}
+                                        @elseif($tournament->team_size == 3)
+                                            {{ __('Triple') }}
+                                        @endif
+                                        -
+                                        @if($tournament->has_brackets)
+                                            {{ __('Pools') }}
+                                        @else
+                                            {{ __('Playoff') }}
+                                        @endif
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             @empty
                 <p class=" dark:text-gray-300">{{ __('No tournament registered') }}</p>
             @endforelse

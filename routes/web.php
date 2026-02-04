@@ -30,7 +30,8 @@ if (env('APP_ENV') == 'local') {
 }
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('tournoi-landing');
+//    return view('welcome');
 });
 
 Route::middleware([

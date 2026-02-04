@@ -8,6 +8,7 @@ use App\Models\Pool;
 use App\Models\PrecisionPool;
 use App\Models\Team;
 use App\Models\Tournament;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -147,6 +148,30 @@ class TournamentRegistration extends Component
 
     public function generate()
     {
+        if($this->tournament->melee) {
+            $players = new Collection();
+            foreach($this->tournament->teams as $team) {
+                foreach ($team->players as $player) {
+                    $players->add($player);
+                }
+            }
+            $players->shuffle();
+            $this->tournament->teams->map->delete();
+            $this->teamsCount = 0;
+            foreach($players->chunk($this->tournament->team_size) as $teamChunk) {
+                $team = new Team();
+                $team->label = __('Team') . ' ' . ++$this->teamsCount;
+                $team->number = $this->teamsCount;
+                $team->tournament_id = $this->tournament->id;
+                $team->save();
+                foreach($teamChunk as $player) {
+                    $player->team_id = $team->id;
+                    $player->save();
+                }
+            }
+            $this->tournament = Tournament::find($this->tournament->id);
+        }
+
         if ($this->tournament->team_size == 0) {
             $this->tournament->generatePrecision();
         } else {

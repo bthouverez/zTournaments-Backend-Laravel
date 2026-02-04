@@ -11,6 +11,9 @@
                 @elseif($tournament->team_size == 3)
                     {{ __('Triple') }}
                 @endif
+                @if($tournament->melee)
+                    {{ __('at melee') }}
+                @endif
                 -
                 @if($tournament->has_brackets)
                     {{ __('Pools') }}
@@ -70,7 +73,7 @@
                         <input wire:keydown.enter="addTeam"
                                class="shadow appearance-none border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline"
                                type="text" wire:model.lazy="newPlayer1" placeholder="{{ __('Player') }} 1">
-                        @if($tournament->team_size > 1)
+                        @if(!$tournament->melee AND $tournament->team_size > 1)
                             <input wire:keydown.enter="addTeam"
                                    class="shadow appearance-none border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline"
                                    type="text" wire:model.lazy="newPlayer2" placeholder="{{ __('Player') }} 2">

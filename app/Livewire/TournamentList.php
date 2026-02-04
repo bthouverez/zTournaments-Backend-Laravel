@@ -15,6 +15,7 @@ class TournamentList extends Component
     public string $place;
     public string $team_size;
     public int $has_brackets;
+    public bool $melee;
 
     public function mount()
     {
@@ -52,11 +53,20 @@ class TournamentList extends Component
         $t->team_size = $this->team_size;
         $t->has_brackets = $this->has_brackets;
         $t->user_id = Auth::user()->id;
+        $t->melee = $this->melee;
         $t->save();
 
         return redirect('/tournaments/'.$t->id.'/registration');
     }
 
+    public function delete($id = 0)
+    {
+        $t = Tournament::find($id);
+        if ($t && $t->user_id == Auth::user()->id) {
+            $t->delete();
+            $this->tournaments = Auth::user()->tournaments;
+        }
+    }
     public function render()
     {
         return view('livewire.tournament-list');
