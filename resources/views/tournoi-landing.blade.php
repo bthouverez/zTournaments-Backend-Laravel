@@ -205,7 +205,7 @@
                 <div class="space-y-8">
                     <div class="inline-block animate-fade-up">
                         <span class="px-4 py-2 bg-[#0F408E]/20 text-[#4A90E2] rounded-full text-sm font-semibold border border-[#0F408E]/30">
-                            🏆 Plateforme n°1 en France
+                            🏆 Plateforme n°1 à Civrieux
                         </span>
                     </div>
 
@@ -218,12 +218,12 @@
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-4 animate-fade-up delay-300">
-                        <button class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg shadow-lg">
-                            Démarrer gratuitement
-                        </button>
-                        <button class="px-8 py-4 bg-white/10 hover:bg-white/20 rounded-lg text-white font-semibold text-lg border border-white/20 transition-all">
-                            Voir la démo
-                        </button>
+                        <a href="/login"><button class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg shadow-lg">
+                            Se connecter
+                        </button></a>
+                        <a href="/register"><button class="px-8 py-4 bg-white/10 hover:bg-white/20 rounded-lg text-white font-semibold text-lg border border-white/20 transition-all">
+                            S'inscrire
+                        </button></a>
                     </div>
 
                     <div class="flex items-center gap-8 pt-6 animate-fade-up delay-400">
