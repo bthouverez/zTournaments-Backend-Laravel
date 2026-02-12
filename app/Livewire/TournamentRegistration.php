@@ -155,10 +155,9 @@ class TournamentRegistration extends Component
                     $players->add($player);
                 }
             }
-            $players->shuffle();
             $this->tournament->teams->map->delete();
             $this->teamsCount = 0;
-            foreach($players->chunk($this->tournament->team_size) as $teamChunk) {
+            foreach($players->shuffle()->chunk($this->tournament->team_size) as $teamChunk) {
                 $team = new Team();
                 $team->label = __('Team') . ' ' . ++$this->teamsCount;
                 $team->number = $this->teamsCount;
