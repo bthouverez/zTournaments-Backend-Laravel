@@ -62,6 +62,7 @@ class TournamentList extends Component
     public function delete($id = 0)
     {
         $t = Tournament::find($id);
+        $t->resetTeams();
         if ($t && $t->user_id == Auth::user()->id) {
             $t->delete();
             $this->tournaments = Auth::user()->tournaments;
