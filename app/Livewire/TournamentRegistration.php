@@ -129,13 +129,13 @@ class TournamentRegistration extends Component
             $player1->team_id = $team->id;
             $player1->save();
 
-            if($this->tournament->team_size > 1) {
+            if($this->tournament->team_size > 1 && !$this->tournament->melee) {
                 $player2 = new Player();
                 $player2->name = ucwords($p2);
                 $player2->team_id = $team->id;
                 $player2->save();
             }
-            if($this->tournament->team_size > 2) {
+            if($this->tournament->team_size > 2 && !$this->tournament->melee) {
                 $player3 = new Player();
                 $player3->name = ucwords($p3);
                 $player3->team_id = $team->id;
@@ -163,10 +163,14 @@ class TournamentRegistration extends Component
                 $team->number = $this->teamsCount;
                 $team->tournament_id = $this->tournament->id;
                 $team->save();
+                $label = "";
                 foreach($teamChunk as $player) {
                     $player->team_id = $team->id;
                     $player->save();
+                    $label .= substr($player->name, 0, max(4, strlen($player->name) / 2));
                 }
+                $team->label = trim($label);
+                $team->save();
             }
             $this->tournament = Tournament::find($this->tournament->id);
         }

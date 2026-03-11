@@ -15,7 +15,7 @@ class TournamentList extends Component
     public string $place;
     public string $team_size;
     public int $has_brackets;
-    public bool $melee;
+    public bool $melee = false;
 
     public function mount()
     {
