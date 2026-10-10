@@ -3,6 +3,8 @@
 use App\Livewire\TournamentRegistration;
 use App\Models\Player;
 use App\Models\Team;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 function registerComponent(\App\Models\Tournament $tournament): TournamentRegistration
 {
@@ -10,6 +12,38 @@ function registerComponent(\App\Models\Tournament $tournament): TournamentRegist
     $component->mount($tournament);
 
     return $component;
+}
+
+/**
+ * Builds a stand-in for Livewire's uploaded file: loadPlayersFile() only ever
+ * calls ->getRealPath() on it, so a tiny stub is enough to drive the import
+ * without going through a real HTTP upload.
+ */
+function fakeUploadedXlsx(array $rows): object
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    foreach ($rows as $i => $row) {
+        $line = $i + 2;
+        foreach ($row as $col => $value) {
+            $sheet->setCellValue(chr(66 + $col) . $line, $value);
+        }
+    }
+
+    $path = sys_get_temp_dir() . '/players_import_test_' . uniqid() . '.xlsx';
+    (new Xlsx($spreadsheet))->save($path);
+
+    return new class($path)
+    {
+        public function __construct(private string $path)
+        {
+        }
+
+        public function getRealPath(): string
+        {
+            return $this->path;
+        }
+    };
 }
 
 it('labels a singles team after the player name', function () {
@@ -81,4 +115,66 @@ it('reshuffles melee registrations into balanced teams without losing any player
     // Melee without pools falls through to a playoff bracket, with both teams seeded
     expect($tournament->playoff)->not->toBeNull();
     expect($tournament->playoff->matches->contains(fn ($g) => $g->team_1_id && $g->team_2_id))->toBeTrue();
+});
+
+it('imports doubles teams from an uploaded spreadsheet', function () {
+    $tournament = createTournament(['team_size' => 2]);
+    $component = registerComponent($tournament);
+
+    $component->playersListFile = fakeUploadedXlsx([
+        ['alice', 'bob'],
+        ['carol', 'dave'],
+    ]);
+    $component->loadPlayersFile();
+    $tournament->refresh();
+
+    expect($tournament->teams)->toHaveCount(2);
+    $numbers = $tournament->teams->pluck('number')->sort()->values()->all();
+    expect($numbers)->toBe([1, 2]);
+
+    $allPlayers = $tournament->teams->flatMap->players->pluck('name')->sort()->values()->all();
+    expect($allPlayers)->toBe(['Alice', 'Bob', 'Carol', 'Dave']);
+});
+
+it('numbers imported singles teams sequentially', function () {
+    $tournament = createTournament(['team_size' => 1]);
+    $component = registerComponent($tournament);
+
+    $component->playersListFile = fakeUploadedXlsx([['alice'], ['bob'], ['carol']]);
+    $component->loadPlayersFile();
+
+    $numbers = $tournament->teams()->orderBy('id')->pluck('number')->all();
+    expect($numbers)->toBe([1, 2, 3]);
+});
+
+it('stops importing at the first blank row', function () {
+    $tournament = createTournament(['team_size' => 1]);
+    $component = registerComponent($tournament);
+
+    $component->playersListFile = fakeUploadedXlsx([['alice'], [''], ['carol']]);
+    $component->loadPlayersFile();
+
+    expect($tournament->teams()->count())->toBe(1);
+    expect($tournament->teams()->first()->label)->toBe('Alice');
+});
+
+it('does not create a blank-named player when a doubles row is missing its second name', function () {
+    $tournament = createTournament(['team_size' => 2]);
+    $component = registerComponent($tournament);
+
+    $component->playersListFile = fakeUploadedXlsx([['alice', '']]);
+    $component->loadPlayersFile();
+
+    $team = $tournament->teams()->first();
+    expect($team->players)->toHaveCount(1);
+    expect($team->players->first()->name)->toBe('Alice');
+});
+
+it('does nothing when no file was selected', function () {
+    $tournament = createTournament(['team_size' => 1]);
+    $component = registerComponent($tournament);
+
+    $component->loadPlayersFile();
+
+    expect($tournament->teams()->count())->toBe(0);
 });

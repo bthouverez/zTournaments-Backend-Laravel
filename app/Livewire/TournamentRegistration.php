@@ -9,8 +9,7 @@ use App\Models\PrecisionPool;
 use App\Models\Team;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -102,48 +101,53 @@ class TournamentRegistration extends Component
     }
 
 
-    public function loadPlayersFile() : void
+    public function loadPlayersFile(): void
     {
-        $this->playersListFile->storeAs('public', 'tmpTab.xlsx');
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('storage/tmpTab.xlsx');
-        $sheet = $spreadsheet->getActiveSheet();
-        $this->teamsCount = 0;
-        $nLigne = 2;
-        while (true) {
-            $p1 = $sheet->getCell('B' . $nLigne)->getValue();
-            $p2 = $sheet->getCell('C' . $nLigne)->getValue();
-            $p3 = $sheet->getCell('D'.$nLigne)->getValue();
-
-            if ($p1 == null) break;
-
-            // Crée l'équipe
-            $team = new Team();
-            $team->label = $this->tournament->team_size <= 1 ? $p1 : __('Team') . ' ' . ++$this->teamsCount;
-//            $team->label = __('Team') . ' ' . ++$this->teamsCount;
-            $team->number = $this->teamsCount;
-            $team->tournament_id = $this->tournament->id;
-            $team->save();
-
-            $player1 = new Player();
-            $player1->name = ucwords($p1);
-            $player1->team_id = $team->id;
-            $player1->save();
-
-            if($this->tournament->team_size > 1 && !$this->tournament->melee) {
-                $player2 = new Player();
-                $player2->name = ucwords($p2);
-                $player2->team_id = $team->id;
-                $player2->save();
-            }
-            if($this->tournament->team_size > 2 && !$this->tournament->melee) {
-                $player3 = new Player();
-                $player3->name = ucwords($p3);
-                $player3->team_id = $team->id;
-                $player3->save();
-            }
-            $nLigne++;
+        if (!$this->playersListFile) {
+            return;
         }
-        File::delete('storage/tmpTab.xlsx');
+
+        $sheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($this->playersListFile->getRealPath())
+            ->getActiveSheet();
+        $this->teamsCount = 0;
+
+        DB::transaction(function () use ($sheet) {
+            $nLigne = 2;
+            while (true) {
+                $p1 = trim((string) $sheet->getCell('B' . $nLigne)->getValue());
+                $p2 = trim((string) $sheet->getCell('C' . $nLigne)->getValue());
+                $p3 = trim((string) $sheet->getCell('D' . $nLigne)->getValue());
+
+                if ($p1 === '') break;
+
+                // Crée l'équipe
+                $this->teamsCount++;
+                $team = new Team();
+                $team->label = $this->tournament->team_size <= 1 ? ucwords($p1) : __('Team') . ' ' . $this->teamsCount;
+                $team->number = $this->teamsCount;
+                $team->tournament_id = $this->tournament->id;
+                $team->save();
+
+                $player1 = new Player();
+                $player1->name = ucwords($p1);
+                $player1->team_id = $team->id;
+                $player1->save();
+
+                if ($this->tournament->team_size > 1 && !$this->tournament->melee && $p2 !== '') {
+                    $player2 = new Player();
+                    $player2->name = ucwords($p2);
+                    $player2->team_id = $team->id;
+                    $player2->save();
+                }
+                if ($this->tournament->team_size > 2 && !$this->tournament->melee && $p3 !== '') {
+                    $player3 = new Player();
+                    $player3->name = ucwords($p3);
+                    $player3->team_id = $team->id;
+                    $player3->save();
+                }
+                $nLigne++;
+            }
+        });
     }
 
     public function generate()
