@@ -42,7 +42,32 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createTournament(array $attributes = []): \App\Models\Tournament
 {
-    // ..
+    $user = \App\Models\User::factory()->create();
+
+    $tournament = new \App\Models\Tournament();
+    $tournament->label = $attributes['label'] ?? 'Tournoi de test';
+    $tournament->date = $attributes['date'] ?? now()->toDateString();
+    $tournament->place = $attributes['place'] ?? null;
+    $tournament->team_size = $attributes['team_size'] ?? 2;
+    $tournament->has_brackets = $attributes['has_brackets'] ?? false;
+    $tournament->melee = $attributes['melee'] ?? false;
+    $tournament->user_id = $attributes['user_id'] ?? $user->id;
+    $tournament->save();
+
+    return $tournament;
+}
+
+function createTeamsFor(\App\Models\Tournament $tournament, int $count): \Illuminate\Support\Collection
+{
+    return collect(range(1, $count))->map(function (int $ii) use ($tournament) {
+        $team = new \App\Models\Team();
+        $team->label = "Team {$ii}";
+        $team->number = $ii;
+        $team->tournament_id = $tournament->id;
+        $team->save();
+
+        return $team;
+    });
 }
