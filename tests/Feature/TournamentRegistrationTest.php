@@ -3,11 +3,14 @@
 use App\Livewire\TournamentRegistration;
 use App\Models\Player;
 use App\Models\Team;
+use App\Models\User;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 function registerComponent(\App\Models\Tournament $tournament): TournamentRegistration
 {
+    auth()->login($tournament->user);
+
     $component = new TournamentRegistration();
     $component->mount($tournament);
 
@@ -177,4 +180,31 @@ it('does nothing when no file was selected', function () {
     $component->loadPlayersFile();
 
     expect($tournament->teams()->count())->toBe(0);
+});
+
+it('lets a collaborator added via the share code manage the tournament', function () {
+    $tournament = createTournament();
+    $collaborator = User::factory()->create();
+    $tournament->collaborators()->attach($collaborator->id);
+    auth()->login($collaborator);
+
+    $component = new TournamentRegistration();
+    $component->mount($tournament);
+
+    expect($component->tournament->id)->toBe($tournament->id);
+});
+
+it('refuses access to a user who is neither the owner nor a collaborator', function () {
+    $tournament = createTournament();
+    $stranger = User::factory()->create();
+    auth()->login($stranger);
+
+    $component = new TournamentRegistration();
+
+    try {
+        $component->mount($tournament);
+        $this->fail('Expected a 403 to be thrown for a user with no access to the tournament.');
+    } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+        expect($e->getStatusCode())->toBe(403);
+    }
 });

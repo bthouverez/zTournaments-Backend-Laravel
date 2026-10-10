@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Game;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -21,6 +22,8 @@ class TournamentBracket extends Component
 
     public function mount(Tournament $tournament)
     {
+        abort_unless($tournament->hasAccess(Auth::user()), 403);
+
         $this->tournament = $tournament;
         $this->matches = Game::join('pools', 'pools.id', '=', 'games.pool_id')
             ->where('pools.tournament_id', '=', $tournament->id)

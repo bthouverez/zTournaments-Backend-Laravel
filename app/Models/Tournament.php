@@ -9,10 +9,66 @@ class Tournament extends Model
 {
     use HasFactory;
 
+    // Characters that are easy to confuse when read off a screen (0/O, 1/I/L) are left out
+    // on purpose, since this code is meant to be typed in by hand or read out loud.
+    private const SHARE_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+    private const SHARE_CODE_LENGTH = 6;
+
+    protected static function booted()
+    {
+        static::creating(function (Tournament $tournament) {
+            if (empty($tournament->share_code)) {
+                $tournament->share_code = self::generateUniqueShareCode();
+            }
+        });
+    }
+
+    public static function generateUniqueShareCode(): string
+    {
+        do {
+            $code = '';
+            for ($i = 0; $i < self::SHARE_CODE_LENGTH; $i++) {
+                $code .= self::SHARE_CODE_ALPHABET[random_int(0, strlen(self::SHARE_CODE_ALPHABET) - 1)];
+            }
+        } while (self::where('share_code', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Finds the tournament for a share code and adds the given user as a collaborator.
+     * Returns null if the code doesn't match any tournament.
+     */
+    public static function joinByCode(string $code, User $user): ?self
+    {
+        $tournament = self::where('share_code', strtoupper(trim($code)))->first();
+
+        if (!$tournament) {
+            return null;
+        }
+
+        if (!$tournament->hasAccess($user)) {
+            $tournament->collaborators()->attach($user->id);
+        }
+
+        return $tournament;
+    }
+
+    public function hasAccess(User $user): bool
+    {
+        return $this->user_id === $user->id || $this->collaborators->contains($user->id);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function collaborators()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
     public function teams() {
         return $this->hasMany(Team::class, 'tournament_id')->orderBy('label');
     }

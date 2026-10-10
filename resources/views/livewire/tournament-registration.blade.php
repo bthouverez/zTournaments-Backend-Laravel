@@ -1,6 +1,12 @@
 <div>
     <section class="md:w-2/3 m-auto">
-        <h1 class="text-2xl font-extrabold dark:text-gray-200">{{ __('Registration') }} - {{ $tournament->label }}</h1>
+        <div class="flex items-center justify-between gap-2">
+            <h1 class="text-2xl font-extrabold dark:text-gray-200">{{ __('Registration') }} - {{ $tournament->label }}</h1>
+            <x-share-code-modal :tournament="$tournament"
+                class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded whitespace-nowrap">
+                {{ __('Share this tournament') }}
+            </x-share-code-modal>
+        </div>
         <h2 class="dark:text-gray-200">@if($tournament->team_size == 0)
                 {{ __('Precision') }}
             @else

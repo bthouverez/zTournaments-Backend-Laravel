@@ -5,6 +5,7 @@ use App\Livewire\TournamentList;
 use App\Livewire\TournamentPlayoff;
 use App\Livewire\TournamentPrecision;
 use App\Livewire\TournamentRegistration;
+use App\Models\Tournament;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,12 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/tournaments', TournamentList::class)->name('tournaments');
+    Route::get('/join/{code}', function (string $code) {
+        $tournament = Tournament::joinByCode($code, Auth::user());
+        abort_unless($tournament, 404);
+
+        return redirect('/tournaments/' . $tournament->id . '/registration');
+    })->name('tournaments.join');
     Route::get('/tournaments/{tournament}/registration', TournamentRegistration::class);
     Route::get('/tournaments/{tournament}/bracket', TournamentBracket::class);
     Route::get('/tournaments/{tournament}/playoff', TournamentPlayoff::class);

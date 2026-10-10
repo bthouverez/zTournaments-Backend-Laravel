@@ -303,5 +303,17 @@
     "Load": "Charger",
     "Load Excel": "Charger tableau Excel",
     "Melee": "Mêlée",
-    "at melee": "à la mêlée"
+    "at melee": "à la mêlée",
+    "Shared with me": "Partagés avec moi",
+    "No shared tournament": "Aucun tournoi partagé avec vous",
+    "Join a tournament": "Rejoindre un tournoi",
+    "Join": "Rejoindre",
+    "Join code": "Code",
+    "No tournament matches this code": "Aucun tournoi ne correspond à ce code",
+    "Share code": "Code de partage",
+    "Share this tournament": "Partager ce tournoi",
+    "Share this code with whoever should help manage this tournament.": "Communiquez ce code aux personnes qui doivent aussi gérer ce tournoi.",
+    "Copy": "Copier",
+    "Copied!": "Copié !",
+    "Close": "Fermer"
 }

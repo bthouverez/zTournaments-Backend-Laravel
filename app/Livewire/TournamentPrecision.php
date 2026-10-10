@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\PrecisionPool;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
@@ -19,6 +20,8 @@ class TournamentPrecision extends Component
 
     public function mount(Tournament $tournament)
     {
+        abort_unless($tournament->hasAccess(Auth::user()), 403);
+
         $this->teams = $tournament->teams->sortBy('created_at')->values();
         $this->pool = $tournament->precision->first()->precision_pool;
     }

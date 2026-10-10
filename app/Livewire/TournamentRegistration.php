@@ -9,6 +9,7 @@ use App\Models\PrecisionPool;
 use App\Models\Team;
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -30,6 +31,8 @@ class TournamentRegistration extends Component
 
     public function mount(Tournament $tournament)
     {
+        abort_unless($tournament->hasAccess(Auth::user()), 403);
+
         $this->tournament = $tournament;
         $this->newPlayer1 = "";
         $this->newPlayer2 = "";

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Tournament;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class TournamentPlayoff extends Component
@@ -18,6 +19,8 @@ class TournamentPlayoff extends Component
 
     public function mount(Tournament $tournament)
     {
+        abort_unless($tournament->hasAccess(Auth::user()), 403);
+
         $this->tournament = $tournament;
         $this->matches = $tournament->playoff->matches;
     }
